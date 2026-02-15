@@ -21,7 +21,10 @@ with open('config_KcatNet.json','r') as f:
 device = torch.device(args.device)
 
 
-df = pd.read_excel(args.file_path)
+if args.file_path.endswith('.csv'):
+    df = pd.read_csv(args.file_path)
+else:
+    df = pd.read_excel(args.file_path)
 protein_seqs = list(set(df['Pro_seq'].tolist()))
 ligand_smiles = list(set(df['Smile'].tolist()))
 protein_dict = protein_init(protein_seqs)
@@ -47,4 +50,7 @@ model.load_state_dict(torch.load('./RESULT/model_KcatNet.pt'))
 
 reg_preds= pred(model, data_loader, device=args.device)
 df['Predicted Kcats'] = [math.pow(10, Kcat_log_value) for Kcat_log_value in reg_preds]
-df.to_excel(args.file_path, index=False)
+if args.file_path.endswith('.csv'):
+    df.to_csv(args.file_path, index=False)
+else:
+    df.to_excel(args.file_path, index=False)
